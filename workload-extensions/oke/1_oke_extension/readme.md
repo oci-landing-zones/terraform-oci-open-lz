@@ -32,21 +32,21 @@
 &nbsp; 
 
 > [!WARNING]
->**Manual Changes for non One-OE LZ**
+>**Manual Changes for other than One-OE LZ**
 >
-> The example configuration assumes you're using One-OE single stack as your LZ. In which case no changes are required and correct keys are already provided. If you're installing extension on top of one of the other LZs you might need to update KEY values as document. When using multi-stack deployment model you need to use OCID instead of keys. Some properties require name change from key to id when using OCID.
+> The example configuration assumes you're using One-OE single stack as your LZ. In which case no changes to the provided configuration are required and extension is ready to be deployed. If you're installing extension on top of one of the other LZs you might need to update KEY values as document. When using multi-stack deployment model you need to use OCID instead of keys. Some properties require name change from key to id when using OCID.
 >
 >| JSON PATH         | Value         |Description                        |
 >| ------------------------- | ------| --------------------------------- |
 >| compartments_configuration.compartments["CMP-LZP-P-PLATFORM-OKE-KEY"].parent_id | OCID, KEY | Platform in Prod workload Environment |
 > | policies_configuration.supplied_policies.\*.statements | CMP PATH | Policies contain CMP path and based on location it needs to be updated. |
 > | network_configuration.network_configuration_categories.oke.category_compartment_id| OCID, KEY | Network compartment in Prod workload environment |
-> | network_configuration.network_configuration_categories.oke.non_vcn_specific_gateways.inject_into_existing_drgs["DRG-KEY"].drg_attachments["DRG-VCN-OKE-PROD-KEY"].drg_route_table_key | OCID, KEY | The DRG route table for spokes |
-> | network_configuration.network_configuration_categories.oke.non_vcn_specific_gateways.inject_into_existing_drgs["DRG-KEY"].drg_key | OCID |  The Hub DRG | 
+> | network_configuration.network_configuration_categories.oke.non_vcn_specific_gateways. inject_into_existing_drgs["DRG-KEY"].drg_attachments["DRG-VCN-OKE-PROD-KEY"].drg_route_table_key | OCID, KEY | The DRG route table for spokes |
+> | network_configuration.network_configuration_categories.oke.non_vcn_specific_gateways. inject_into_existing_drgs["DRG-KEY"].drg_key | OCID |  The Hub DRG | 
 
 
 ## **2. IAM**
-For configuring and running the One-OE Landing Zone OKE extension Identity Layer use the following JSON file: [oke_identity.auto.tfvars.json](./oke_identity.auto.tfvars.json). You can customize this configuration to fit your exact OCI IAM topology.
+For configuring and running the One-OE Landing Zone OKE extension Identity Layer use the following JSON file: [oke_identity.auto.tfvars.json](./oke_identity.auto.tfvars.json). You can customize this configuration to fit your exact OCI IAM topology. The identity file needs to be integrated with your current LZ configuration file. 
 
 ###  **2.1. Compartments**
 The OKE LZ extension creates OKE compartment in the production workload envrionment as a platform.
@@ -148,22 +148,14 @@ Refer to [OKE policies](https://docs.oracle.com/en-us/iaas/Content/ContEng/Conce
 
 ## **3. Setup Network Configuration**
 
+For configuring and running the OKE LZ extension Network layer use the following JSON file: [oke_network.auto.tfvars.json](./oke_network.auto.tfvars.json). This file needs to be integrated with your current LZ network configuration file.
+
 The OKE Cluster requires specific subnets. You can review all these requirements in the [OKE documentation](https://docs.oracle.com/en-us/iaas/Content/ContEng/Concepts/contengnetworkconfig.htm)
 
 <img src="../content/net-oke.png" width="1000" height="auto">
 
-For configuring and running the OKE LZ extension Network layer use the following JSON file: [oke_network.auto.tfvars.json](./oke_network.auto.tfvars.json)
 
 Our OKE LZ extension will deploy the necessary core resources for  the Production workload environment included in the ONE-OE blueprint. This example is based on the OCI VCN-Native Pod Networking CNI scenario.
-
-The network layer covers the following resources:
-1. Dedicated Spoke VCN for OKE Cluster
-2. OKE required subnets: cp, workers, pods, lb
-3. Service Gateway for access to OCI services
-4. Security List allowing ICMP ingress/egress from anywhere
-5. Recommended NSG definition
-6. Spoke Route Tables
-7. DRG Attachment to connect with Hub network
 
 
 > [!NOTE]
@@ -173,16 +165,18 @@ The network layer covers the following resources:
 
 ### **3.1 VCNs**
 
+Dedicated spoke VCN is created for OKE Platform insdie the workload envrionment.
+
 The following table describes the deployed VCNs.
 
 | ID       | NAME           | OBJECTIVES                         |
 | ------  | -------------- | ---------------------------------- |
-| VCN.02  | vcn-fra-lzp-p-platform-oke | Spoke VCN dedicated to Prod OKE set-up |
+| VCN.00  | vcn-fra-lzp-p-platform-oke | Spoke VCN dedicated to Prod OKE set-up |
 
 
 ### **3.2 Subnets**
-
-The following table describes the deployed Subnets added for each environment OKE platform:
+OKE has requirements for subnets and their sizes needed for deploying OKE. 
+The following table describes the deployed Subnets added for each OKE platform:
 
 | ID    |  NAME             | OBJECTIVES                |
 | ----- | ---------------- | ------------------------- |
@@ -214,9 +208,8 @@ The following table describes the deployed Security Lists (SLs):
 | SL.02 | sl-lzp-p-platform-lb | OKE Prod Load Balancer subnet security list |
 | SL.03 | sl-lzp-p-platform-cp | OKE Prod Control Plane subnet security list |
 
-
-
 ### **3.5 Gateways**
+As part of OKE extenstion deployment we also provision DRG attachments to connect to Hub network and Service gateway to allow OKE use OCI services directly from Spoke VCN.
 
 
 #### **3.5.1 Dynamic Routing Gateway (DRGs) Attachments**
@@ -243,7 +236,7 @@ The following table describes the proposed Service Gateways added for each envir
 
 Use the link above to deploy using [Oracle Resource Manager (ORM)](/../../../commons/content/orm.md) or use [Terraform CLI](../../../commons/content/terraform.md)
 
-After successful deployment it's required to complete the network layer setup. You need to update the routing in the hub as defined in [POST operation 1.1](../1_oke_extension/1.1_Network_post_updates/readme.md). Once completed, everything will be ready for deploying OKE cluster.
+After successful deploymenyou need to update the routing in the hub as defined in [POST operation 1.1](../1_oke_extension/1.1_Network_post_updates/readme.md). Once completed, everything will be ready for deploying OKE cluster.
 
 You can now proceed with [Step 2](../2_oke/).
 

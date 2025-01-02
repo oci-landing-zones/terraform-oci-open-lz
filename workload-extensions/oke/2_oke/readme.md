@@ -15,8 +15,6 @@
 
 We recommend automating the OKE Cluster deployment using Terraform. 
 
-To deploy a new OKE Cluster ( VCN-native pod networking for OKE CNI ) as a new Platform (on top of ONE-OE LZ), follow next steps.
-
 For this Demo we are going to use Cloud Shell. See the full module documentation [here](https://github.com/oracle-terraform-modules/terraform-oci-oke/tree/main/examples) if required.
 
 1. Click the 'Next' button, cloud shell will be open
