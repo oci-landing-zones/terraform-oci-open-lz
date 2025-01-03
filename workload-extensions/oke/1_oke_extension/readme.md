@@ -56,9 +56,6 @@ There are multiple options where OKE platform can be deployed. Either as inside 
 <img src="../content/sec-oke.png" width="1000" height="auto">
 
 The following diagram covers the same example deployment with 2 Landing zone environments instead of a single one.
-
-<img src="../content/sec-oke-lzn.png" width="1000" height="auto">
-
 For simplicity, we will use single landing zone environment, with only production workload environment option in this template.
 
 > [!NOTE]
