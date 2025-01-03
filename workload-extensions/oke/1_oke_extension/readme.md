@@ -1,4 +1,4 @@
-# Foundations set-up <!-- omit from toc -->
+# OKE Extension set-up <!-- omit from toc -->
 
 ## **Table of Contents** <!-- omit from toc -->
 
@@ -20,7 +20,7 @@
 
 ## **1. Summary**
 
-|                         |                                                                                                                            |
+| | |
 | ----------------------- | -------------------------------------------------------------------------------------------------------------------------- |
 | **NAME**                | OKE Landing Zone Extension set-up                                                                                                    |
 | **OBJECTIVE**           | Provision Identity and Network                                                                               |
@@ -31,27 +31,23 @@
 
 &nbsp; 
 
+## **2. IAM**
+For configuring and running the One-OE Landing Zone OKE Extension Identity Layer use the following JSON file: [oke_identity.auto.tfvars.json](./oke_identity.auto.tfvars.json). The identity file needs to be integrated with your current LZ configuration file or deployed as a new stack. 
+
 > [!WARNING]
->**Manual Changes required for other than One-OE LZ**
+>**Manual Changes required for Multi-OE and Multi-Tenancy Landing Zone**
 >
-> The example configuration assumes you're using One-OE single stack as your LZ. In which case no changes to the provided configuration are required and extension is ready to be deployed. If you're installing extension on top of one of the other LZs you might need to update KEY values as documented below. When using multi-stack deployment model you need to use OCID instead of keys. Some properties require name change from key to id when using OCID.
+> The configuration assumes you're using One-OE Single Stack as your LZ, in which case configuration is ready to be deployed. If you're installing extension on top of one of the other LZs you need to update KEY values as documented below. When using multi-stack deployment model you need to use OCID instead of keys. Some properties require name change from key to id when using OCID.
 >
 >| JSON PATH         | Value         |Description                        |
 >| ------------------------- | ------| --------------------------------- |
 >| compartments_configuration.compartments["CMP-LZP-P-PLATFORM-OKE-KEY"].parent_id | OCID, KEY | Platform in Prod workload Environment |
-> | policies_configuration.supplied_policies.\*.statements | CMP PATH | Policies contain CMP path and based on location it needs to be updated. |
-> | network_configuration.network_configuration_categories.oke.category_compartment_id| OCID, KEY | Network compartment in Prod workload environment |
-> | network_configuration.network_configuration_categories.oke.non_vcn_specific_gateways. inject_into_existing_drgs["DRG-KEY"].drg_attachments["DRG-VCN-OKE-PROD-KEY"].drg_route_table_key | OCID, KEY | The DRG route table for spokes |
-> | network_configuration.network_configuration_categories.oke.non_vcn_specific_gateways. inject_into_existing_drgs["DRG-KEY"].drg_key | OCID |  The Hub DRG | 
-
-
-## **2. IAM**
-For configuring and running the One-OE Landing Zone OKE extension Identity Layer use the following JSON file: [oke_identity.auto.tfvars.json](./oke_identity.auto.tfvars.json). You can customize this configuration to fit your exact OCI IAM topology. The identity file needs to be integrated with your current LZ configuration file. 
+>| policies_configuration.supplied_policies.\*.statements | CMP PATH | Policies contain CMP path and based on location it needs to be updated. |
 
 ###  **2.1. Compartments**
-The OKE LZ extension creates OKE compartment in the production workload envrionment as a platform.
+The OKE LZ extension creates OKE Compartment in the production workload environment as a platform.
 
-There are multiple options where OKE platform can be deployed. Either as inside workload environments or as a shared cluster between all workload environments the example is shown in the  diagram below:
+There are multiple options where OKE platform can be deployed. Either as inside workload environments or as a shared cluster between all workload environments the example is shown in the diagram below:
 
 <img src="../content/sec-oke.png" width="1000" height="auto">
 
@@ -61,14 +57,9 @@ For simplicity, we will use single landing zone environment, with only productio
 > [!NOTE]
 > For documentation of Compartments definition format refer to the [Identity & Access Management CIS Terraform module compartment example](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-iam/blob/main/compartments/examples/vision/input.auto.tfvars.template).
 
-
-
 ### **2.2 Groups**
 
-The OKE extension will deploy IAM groups to manage resources in OKE compartments and provide fine-grained access to specific OKE resources.
-
-As part of the deployment the following groups are created in the [Default Identity Domain](https://docs.oracle.com/en-us/iaas/Content/Identity/domains/overview.htm):
-
+The OKE extension will deploy IAM groups to manage resources in OKE compartments and provide fine-grained access to specific OKE resources. As part of the deployment the following groups are created in the [Default Identity Domain](https://docs.oracle.com/en-us/iaas/Content/Identity/domains/overview.htm):
 
 | ID     |     NAME                       | TYPE | OBJECTIVES                                  |
 | ------ |  -------------------------- | ------------------------------------------- |---|
@@ -79,7 +70,7 @@ As part of the deployment the following groups are created in the [Default Ident
 In our pattern we define two different types of groups:
 
 1. **IAM groups** to manage OCI resources in OKE compartments.
-2. **IAM groups with OKE RBAC** to grant access to OKE and map IAM Groups to Kubernetes Group. Kubernetes Groups can be used with combination of Kubernetes roles and role binding to grant users permissions within Kubernetes. For example, a role might include read permission on pods and list permission for pods. A Kubernetes RBAC rolebinding attaches a role to a user or group, granting that role's permissions to the user or group for resources in a namespace. IAM and the Kubernetes RBAC Authorizer work together to enable users who have been successfully authorized by both to complete the requested Kubernetes operation.
+2. **IAM groups with OKE RBAC** to grant access to OKE and map IAM Groups to Kubernetes Group. Kubernetes Groups can be used with combination of Kubernetes roles and role binding to grant users permissions within Kubernetes. For example, a role might include read permission on pods and list permission for pods. A Kubernetes RBAC RoleBinding attaches a role to a user or group, granting that role's permissions to the user or group for resources in a namespace. The IAM and Kubernetes RBAC Authorizer work together to enable users who have been successfully authorized by both to complete the requested Kubernetes operation.
 
 For RBAC Groups in addition to setting-up IAM we also need to set-up Kubernetes by creating a mapping between OCI Group and Kubernetes Group.
 
@@ -114,7 +105,7 @@ roleRef:
 EOF
 ```
 
-To check all the steps for managing RBAC visit [documentation](https://docs.oracle.com/en-us/iaas/Content/ContEng/Concepts/contengaboutaccesscontrol.htm#About_Access_Control_and_Container_Engine_for_Kubernetes).
+To check all the steps for managing Kubernetes RBAC visit [documentation](https://docs.oracle.com/en-us/iaas/Content/ContEng/Concepts/contengaboutaccesscontrol.htm#About_Access_Control_and_Container_Engine_for_Kubernetes).
 
 > [!NOTE]
 > For documentation of IAM Groups definition format refer to the  [Identity & Access Management CIS Terraform module groups example](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-iam/blob/main/groups/examples/vision/input.auto.tfvars.template)
@@ -131,7 +122,7 @@ As part of the deployment the following policies are created:
 | pcy-p-platform-oke-vcn-cni | Policy is required when a cluster and its resources reside in separate compartments. This [policy](https://docs.oracle.com/en-us/iaas/Content/ContEng/Concepts/contengpodnetworking_topic-OCI_CNI_plugin.htm) is only needed for OKE native VCN CNI networking (recommended). If you are using  flannel CNI the policy is not needed.| instances  | private-ips, network-security-groups | -    |
 
 
-It's possible to grant permissions for Kubernetes Service Account directly using OCI IAM when using Advanced OKE Service for enchanced security posture and isolation of concerns. Refer to [Workload Access documentation](https://docs.oracle.com/en-us/iaas/Content/ContEng/Tasks/contenggrantingworkloadaccesstoresources.htm)
+It's possible to grant permissions for Kubernetes Service Account directly using OCI IAM when using Advanced OKE Service for enhanced security posture and isolation of concerns. Refer to [Workload Access documentation](https://docs.oracle.com/en-us/iaas/Content/ContEng/Tasks/contenggrantingworkloadaccesstoresources.htm)
 
 Additional policies may be required for using [Capacity Reservations](https://docs.oracle.com/en-us/iaas/Content/ContEng/Tasks/contengmakingcapacityreservations.htm) or if you choose to [manage the master encryption key yourself](https://docs.oracle.com/en-us/iaas/Content/ContEng/Tasks/contengencryptingdata.htm). 
 Refer to [OKE policies](https://docs.oracle.com/en-us/iaas/Content/ContEng/Concepts/contengpolicyconfig.htm#Policy_Configuration_for_Cluster_Creation_and_Deployment) documentation for more details.
@@ -141,11 +132,24 @@ Refer to [OKE policies](https://docs.oracle.com/en-us/iaas/Content/ContEng/Conce
 > [!NOTE]
 > For documentation of IAM Poilicy definition format refer to the [Identity & Access Management CIS Terraform module policies examples](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-iam/tree/main/policies/examples) and [policy resource documentation](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-iam/tree/main/policies)
 
-
+&nbsp;
 
 ## **3. Setup Network Configuration**
 
 For configuring and running the OKE LZ extension Network layer use the following JSON file: [oke_network.auto.tfvars.json](./oke_network.auto.tfvars.json). This file needs to be integrated with your current LZ network configuration file.
+
+> [!WARNING]
+>**Manual Changes required for Multi-OE and Multi-Tenancy Landing Zone**
+>
+> The configuration assumes you're using One-OE Single Stack as your LZ, in which case configuration is ready to be deployed. If you're installing extension on top of one of the other LZs you need to update KEY values as documented below. When using multi-stack deployment model you need to use OCID instead of keys. Some properties require name change from key to id when using OCID.
+>
+>| JSON PATH         | Value         |Description                        |
+>| ------------------------- | ------| --------------------------------- |
+>| network_configuration.network_configuration_categories.oke.category_compartment_id| OCID, KEY | Network compartment in Prod workload environment |
+>| network_configuration.network_configuration_categories.oke.non_vcn_specific_gateways. inject_into_existing_drgs["DRG-KEY"].drg_attachments["DRG-VCN-OKE-PROD-KEY"].drg_route_table_key | OCID, KEY | The DRG route table for spokes |
+>| network_configuration.network_configuration_categories.oke.non_vcn_specific_gateways. inject_into_existing_drgs["DRG-KEY"].drg_key | OCID |  The Hub DRG | 
+
+
 
 The OKE Cluster requires specific subnets. You can review all these requirements in the [OKE documentation](https://docs.oracle.com/en-us/iaas/Content/ContEng/Concepts/contengnetworkconfig.htm)
 
@@ -158,11 +162,10 @@ Our OKE LZ extension will deploy the necessary core resources for  the Productio
 > [!NOTE]
 > For documentation of Network  definition format refer to the [Networking documentation](https://github.com/oracle-quickstart/terraform-oci-cis-landing-zone-networking)
 
-&nbsp; 
 
 ### **3.1 VCNs**
 
-Dedicated spoke VCN is created for OKE Platform insdie the workload envrionment.
+Dedicated spoke VCN is created for OKE Platform inside the workload environment.
 
 The following table describes the deployed VCNs.
 
@@ -232,17 +235,17 @@ The following table describes the proposed Service Gateways added for each envir
 ## **4. Deploy**
 <a href='https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oracle-quickstart/terraform-oci-landing-zones-orchestrator/archive/refs/tags/v2.0.2.zip'><img src="../../../commons/images/DeployToOCI.svg" height="30"></a>
 
-Use the link above to deploy using [Oracle Resource Manager (ORM)](/../../../commons/content/orm.md) or use [Terraform CLI](../../../commons/content/terraform.md)
+Use the link above to deploy using [Oracle Resource Manager (ORM)](../../../commons/content/orm.md) or use [Terraform CLI](../../../commons/content/terraform.md)
 
 After successful deploymenyou need to update the routing in the hub as defined in [POST operation 1.1](../1_oke_extension/1.1_Network_post_updates/readme.md). Once completed, everything will be ready for deploying OKE cluster.
 
-You can now proceed with [Step 2](../2_oke/).
+You can now proceed with [Step 2 - OKE cluster creation](../2_oke/).
 
 &nbsp;
 
 # License <!-- omit from toc -->
 
-Copyright (c) 2024 Oracle and/or its affiliates.
+Copyright (c) 2025 Oracle and/or its affiliates.
 
 Licensed under the Universal Permissive License (UPL), Version 1.0.
 
