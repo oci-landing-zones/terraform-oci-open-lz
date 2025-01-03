@@ -32,9 +32,9 @@
 &nbsp; 
 
 > [!WARNING]
->**Manual Changes for other than One-OE LZ**
+>**Manual Changes required for other than One-OE LZ**
 >
-> The example configuration assumes you're using One-OE single stack as your LZ. In which case no changes to the provided configuration are required and extension is ready to be deployed. If you're installing extension on top of one of the other LZs you might need to update KEY values as document. When using multi-stack deployment model you need to use OCID instead of keys. Some properties require name change from key to id when using OCID.
+> The example configuration assumes you're using One-OE single stack as your LZ. In which case no changes to the provided configuration are required and extension is ready to be deployed. If you're installing extension on top of one of the other LZs you might need to update KEY values as documented below. When using multi-stack deployment model you need to use OCID instead of keys. Some properties require name change from key to id when using OCID.
 >
 >| JSON PATH         | Value         |Description                        |
 >| ------------------------- | ------| --------------------------------- |
@@ -230,6 +230,7 @@ The following table describes the proposed Service Gateways added for each envir
 | ----- |  ------------- | -------------------- |
 | SGW.00 |  sgw-fra-lzp-p-oke | SGW OKE Prod VCN. |
 
+&nbsp;
 
 ## **4. Deploy**
 <a href='https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https://github.com/oracle-quickstart/terraform-oci-landing-zones-orchestrator/archive/refs/tags/v2.0.2.zip'><img src="../../../commons/images/DeployToOCI.svg" height="30"></a>
