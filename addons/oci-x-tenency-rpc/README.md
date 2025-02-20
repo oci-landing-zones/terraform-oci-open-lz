@@ -4,29 +4,19 @@
 
 &nbsp; 
 
-**Table of Contents**
-
-- [Overview](#Overview)</br>
-- [OCI Private DNS resources](#OCI-Private-DNS-resources)</br>
-- [VCN DNS Resolver processing order](#VCN-DNS-Resolver-processing-order)</br>
-- [Single-Region: Private DNS configuration view](#1-Single-Region-Private-DNS-configuration-view)</br>
-  - [Single-Region: DNS query animation](#11-Single-Region-DNS-query-animation)</br>
-- [Multi-Region: Private DNS configuration view](#2-Multi-Region-Private-DNS-configuration-view)</br>
-  - [Multi-Region: DNS query animation](#21-Multi-Region-DNS-query-animation)
-
 &nbsp;
 
 ## **Overview**
 This configuration enables to establish connectivity between two regions in same tenancy and across multiple tenancies, managed by a central network team. It includes all necessary RPC configurations, such as policy creation, RPC setup, and connection establishment. This approach ensures consistency, simplifies administration, and eliminates the complexity of managing RPC across multiple OCI tenancies.
 
 This document provides configuration views for the following use cases:
-- Single-Tenancy-RPC: Establishes a remote peering connection between two regions within a single tenancy.
 - Multi-Tenancy-RPC: Establishes a remote peering connection between the same or different regions across multiple tenancies.
+- Single-Tenancy-RPC: Establishes a remote peering connection between two regions within a single tenancy.
 
 
 &nbsp;
 
-### OCI Private DNS resources
+### OCI crmultioss tenancy RPC resources
 
 | Resource | Description |
 | - | - |
@@ -37,4 +27,21 @@ This document provides configuration views for the following use cases:
 &nbsp;
 
 ### OCI X Tenancy RPC Setup
-The VCN DNS resolver processes queries in the priority order presented below. It attempts to resolve each query by sequentially checking the configured options. 
+This guide provides step-by-step instructions for setting up a cross-tenancy Remote Peering Connection (RPC) in OCI. By following this guide, organizations can securely establish network connectivity between multiple tenancies, enabling seamless interconnectivity for distributed workloads. 
+
+&nbsp;
+
+## 1. Multi-Tenancy-RPC
+&nbsp;
+Configuration details:
+  - Primary/Shared Hub tenancy conisits of the following resources and components
+    - Dynamic Routing Gateway (DRG) and Remote Peering Connection (RPC)
+    - IAM policy (Acceptor) statements to accept the remote peering connection from other/spoke tenancy. 
+  - Child/Spoke Tenancy conisits of the following resources and components
+    - Dynamic Routing Gateway (DRG) and Remote Peering Connection (RPC)
+    - IAM policy (Requestor) statements to request the remote peering connection to the Primary/Shared Hub tenancy. 
+
+<img src="images/x-tenancy.png" width="900" height="value">
+
+&nbsp;
+
